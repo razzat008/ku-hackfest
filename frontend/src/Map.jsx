@@ -28,6 +28,9 @@ const MapComponent = () => {
     })
   );
 
+  const aY = useRef(
+  );
+
   const xyzLayer = useRef(
     new TileLayer({
       source: new XYZ({
@@ -72,11 +75,21 @@ const MapComponent = () => {
     // Initialize OpenLayers map
     const map = new Map({
       target: mapRef.current,
-      layers: [osmLayer.current, xyzLayer.current], // Add both layers
+      layers: [
+        osmLayer.current, 
+        xyzLayer.current,
+        new VectorLayer({
+        source: new VectorSource({
+          format:new GeoJSON(),
+          url: "../localunits.geojson",
+          }),
+        }),
+      ], // Add both layers
       view: new View({
         center: kathmanduCoordinates,
         zoom: 15, // Initial zoom level
       }),
+
     });
 
     mapViewRef.current = map.getView();
