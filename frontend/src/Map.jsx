@@ -4,6 +4,12 @@ import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import { fromLonLat } from 'ol/proj';
+import HeatmapLayer from 'ol/layer/Heatmap';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import GeoJSON from 'ol/format/GeoJSON';
 
 const MapComponent = () => {
   const mapRef = useRef(null);
@@ -14,18 +20,54 @@ const MapComponent = () => {
 
   useEffect(() => {
     const kathmanduCoordinates = fromLonLat([longitude, latitude]);
+    
+    const points = [
+      [85.3240, 27.7172],
+      [85.3213, 27.7140],
+      [85.3280, 27.7200],
+      [85.3267, 27.7152],
+      [85.3333, 27.7195],
+      [85.3299, 27.7184],
+    ];
+
+    // Convert points to features for the VectorSource
+    const features = points.map(([lon, lat]) => {
+      return new Feature({
+        geometry: new Point(fromLonLat([lon, lat])),
+      });
+    });
+
+    // Create Vector Source and Heatmap Layer
+    const vectorSource = new VectorSource({
+      features: features,
+    });
+
+    const heatmapLayer = new HeatmapLayer({
+      source: vectorSource,
+      blur: 20, // Amount of blur on each point (adjust as needed)
+      radius: 10, // Radius of influence for each point (adjust as needed)
+      opacity: 0.8,
+    });
+
 
     // Initialize OpenLayers map
     const map = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({
-          source: new OSM(),
+      new TileLayer({
+        source : new OSM(), 
+      }),
+      new VectorLayer({
+        source: new VectorSource({
+          format:new GeoJSON,
+          url: '../localunits.geojson', 
         }),
+      }),
+        heatmapLayer,
       ],
       view: new View({
         center: kathmanduCoordinates,
-        zoom: 44,
+        zoom: 14,
       }),
     });
 
