@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoData API</title>
+  <style>
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>GeoData API</h1>
+  <form id="bboxForm">
+    <label for="min_lon">Min Longitude:</label>
+    <input type="number" id="min_lon" name="min_lon" step="any" value="83.96919250488281" required>
+    <br>
+    <label for="min_lat">Min Latitude:</label>
+    <input type="number" id="min_lat" name="min_lat" step="any" value="28.194446860487773" required>
+    <br>
+    <label for="max_lon">Max Longitude:</label>
+    <input type="number" id="max_lon" name="max_lon" step="any" value="83.99751663208006" required>
+    <br>
+    <label for="max_lat">Max Latitude:</label>
+    <input type="number" id="max_lat" name="max_lat" step="any" value="28.214869548073377" required>
+    <br>
+    <button type="submit">Get GeoData</button>
+  </form>
+  <div id="loading" style="display: none;">Loading...</div>
+  <div id="error" class="error"></div>
+  <h2>Points</h2>
+  <pre id="pointsResult"></pre>
+  <div id="pointsFile"></div>
+  <h2>Polygons</h2>
+  <pre id="polygonsResult"></pre>
+  <div id="polygonsFile"></div>
+
+  <script>
+    document.getElementById('bboxForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const loadingElement = document.getElementById('loading');
+      const errorElement = document.getElementById('error');
+      const pointsResultElement = document.getElementById('pointsResult');
+      const polygonsResultElement = document.getElementById('polygonsResult');
+      const pointsFileElement = document.getElementById('pointsFile');
+      const polygonsFileElement = document.getElementById('polygonsFile');
+
+      loadingElement.style.display = 'block';
+      errorElement.textContent = '';
+      pointsResultElement.textContent = '';
+      polygonsResultElement.textContent = '';
+      pointsFileElement.textContent = '';
+      polygonsFileElement.textContent = '';
+
+      const min_lon = document.getElementById('min_lon').value;
+      const min_lat = document.getElementById('min_lat').value;
+      const max_lon = document.getElementById('max_lon').value;
+      const max_lat = document.getElementById('max_lat').value;
+
+      try {
+        const response = await fetch('/api/geo-data/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            min_lon: min_lon,
+            min_lat: min_lat,
+            max_lon: max_lon,
+            max_lat: max_lat
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        pointsResultElement.textContent = data.points ? JSON.stringify(JSON.parse(data.points), null, 2) : 'No point data available';
+        polygonsResultElement.textContent = data.polygons ? JSON.stringify(JSON.parse(data.polygons), null, 2) : 'No polygon data available';
+
+        pointsFileElement.textContent = data.points_file ? `Points saved to: ${data.points_file}` : 'No points data saved.';
+        polygonsFileElement.textContent = data.polygons_file ? `Polygons saved to: ${data.polygons_file}` : 'No polygons data saved.';
+      } catch (error) {
+  
