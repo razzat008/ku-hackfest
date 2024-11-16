@@ -6,7 +6,6 @@ function App() {
   return (
     <div className="App">
       <TypingLoader/>
-      <RightBar/>
       <MapComponent/>
     </div>
   );

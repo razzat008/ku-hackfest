@@ -48,6 +48,15 @@ const MapComponent = () => {
     })
   );
 
+
+const handleLayerToggle = (layerId, isActive) => {
+  if (layerId === 'hospital') {
+    hospitalLayer.current.setVisible(isActive);
+  } else if (layerId === 'school') {
+    schoolLayer.current.setVisible(isActive);
+  }
+};
+
   const xyzLayer = useRef(
     new TileLayer({
       source: new XYZ({
@@ -231,13 +240,14 @@ useEffect(() => {
         </div>
       </div>
 
-      <RightBar
-        onBBoxClick={handleBBoxClick}
-        currentZoom={currentZoom}
-        bounds={bounds}
-        onToggleOverlay={toggleOverlay}
-        showOverlay={showOverlay}
-      />
+    <RightBar
+      onBBoxClick={handleBBoxClick}
+      currentZoom={currentZoom}
+      bounds={bounds}
+      onToggleOverlay={toggleOverlay}
+      showOverlay={showOverlay}
+      onLayerToggle={handleLayerToggle}
+    />
     </div>
   );
 };
