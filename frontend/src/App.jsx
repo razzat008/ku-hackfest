@@ -7,7 +7,7 @@ function App() {
     <div className="App">
       <TypingLoader/>
       <RightBar/>
-      <MapComponent />
+      <MapComponent/>
     </div>
   );
 }
