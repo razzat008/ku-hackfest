@@ -1,0 +1,25 @@
+.typing-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #282c34; /* Adjust to your theme */
+  color: white;
+  font-size: 2rem;
+  font-family: monospace;
+  transition: opacity 1s ease-in-out; /* Smooth fade-out effect */
+  z-index: 9999;
+}
+
+.typing-loader.hidden {
+  opacity: 0; /* Fully transparent */
+  pointer-events: none; /* Prevent interactions when hidden */
+}
+
+.typing-loader.visible {
+  opacity: 1; /* Fully visible */
+}
