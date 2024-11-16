@@ -10,7 +10,6 @@ import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import GeoJSON from 'ol/format/GeoJSON';
-
 import XYZ from 'ol/source/XYZ';
 
 const MapComponent = () => {
@@ -20,13 +19,43 @@ const MapComponent = () => {
   const [isGradientVisible, setIsGradientVisible] = useState(false);
   const mapViewRef = useRef(null);
   const [selectedLayer, setSelectedLayer] = useState('osm'); // Layer selection state
-
   const osmLayer = useRef(
     new TileLayer({
       source: new OSM(),
       visible: true, // Default visible layer
     })
   );
+  const riverLayer = useRef(
+      new VectorLayer({
+        source: new VectorSource({
+          format:new GeoJSON(),
+          url: "../river.geojson",
+          }),
+      })
+    )
+
+  const buildingLayer = useRef(
+      new VectorLayer({
+        source: new VectorSource({
+          format:new GeoJSON(),
+          url: "../building.geojson",
+          }),
+      })
+    )
+
+  const handleLayerChange = (event) => {
+    const selected = event.target.value;
+    setSelectedLayer(selected);
+
+    // Update layer visibility
+    if (selected === 'osm') {
+      osmLayer.current.setVisible(true);
+      xyzLayer.current.setVisible(false);
+    } else if (selected === 'xyz') {
+      osmLayer.current.setVisible(false);
+      xyzLayer.current.setVisible(true);
+    }
+  };
 
   const aY = useRef(
   );
@@ -76,6 +105,8 @@ const MapComponent = () => {
     const map = new Map({
       target: mapRef.current,
       layers: [
+        riverLayer.current,
+        buildingLayer.current,
         osmLayer.current, 
         xyzLayer.current,
         new VectorLayer({
@@ -110,19 +141,6 @@ const MapComponent = () => {
   };
 
   // Handle layer switch
-  const handleLayerChange = (event) => {
-    const selected = event.target.value;
-    setSelectedLayer(selected);
-
-    // Update layer visibility
-    if (selected === 'osm') {
-      osmLayer.current.setVisible(true);
-      xyzLayer.current.setVisible(false);
-    } else if (selected === 'xyz') {
-      osmLayer.current.setVisible(false);
-      xyzLayer.current.setVisible(true);
-    }
-  };
 
   return (
     <div style={{ position: 'relative', width: '75vw', height: '100vh', margin: '0 auto' }}>
